@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using CarWorkshop.Server.Models;
+using System.Diagnostics;
 
 namespace CarWorkshop.Server.Controllers
 {
