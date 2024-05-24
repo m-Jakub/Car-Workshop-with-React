@@ -1,16 +1,13 @@
 import React from 'react';
+import { Navigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Route, Navigate } from 'react-router-dom';
 
-const PrivateRoute = ({ component: Component, isAuthenticated, ...rest }) => (
-  <Route
-    {...rest}
-    element={isAuthenticated ? <Component /> : <Navigate to="/login" replace />}
-  />
-);
+const PrivateRoute = ({ element, isAuthenticated, ...rest }) => {
+  return isAuthenticated ? element : <Navigate to="/login" />;
+};
 
 PrivateRoute.propTypes = {
-  component: PropTypes.elementType.isRequired,
+  element: PropTypes.element.isRequired,
   isAuthenticated: PropTypes.bool.isRequired,
 };
 
