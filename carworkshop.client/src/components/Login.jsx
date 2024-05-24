@@ -1,36 +1,35 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { login } from '../services/authService'; // Import the login function from authService
 
 function Login() {
-    // Component state
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
 
-    // Function to handle form submission
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            // Make POST request to login endpoint
-            const response = await axios.post('/api/auth/login', { username, password });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-            // Handle successful login (e.g., redirect user)
-        } catch (error) {
-            setError('Invalid username or password');
-        }
-    };
+    try {
+      await login(username, password, rememberMe);
+      
+      navigate('/dashboard');
+    } catch (error) {
+      setError('Invalid username or password');
+    }
+  };
 
-    return (
-        <div>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <input type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
-                <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <button type="submit">Login</button>
-            </form>
-            {error && <p>{error}</p>}
-        </div>
-    );
+  return (
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleSubmit}>
+        <button type="submit">Login</button>
+      </form>
+      {error && <p>{error}</p>}
+    </div>
+  );
 }
 
 export default Login;

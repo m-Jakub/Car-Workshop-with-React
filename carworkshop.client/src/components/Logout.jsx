@@ -1,25 +1,19 @@
 import React from 'react';
-import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Logout() {
-    // Function to handle logout
-    const handleLogout = async () => {
-        try {
-            // Make POST request to logout endpoint
-            await axios.post('/api/auth/logout');
+  const navigate = useNavigate(); 
+  
+  const handleLogout = async () => {
+    navigate('/login');
+  };
 
-            // Handle successful logout (e.g., redirect user)
-        } catch (error) {
-            console.error('Logout failed:', error);
-        }
-    };
-
-    return (
-        <div>
-            <h2>Logout</h2>
-            <button onClick={handleLogout}>Logout</button>
-        </div>
-    );
+  return (
+    <div>
+      <h2>Logout</h2>
+      <button onClick={handleLogout}>Logout</button>
+    </div>
+  );
 }
 
 export default Logout;

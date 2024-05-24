@@ -7,9 +7,20 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("default");
 
-// Add services to the container.
-
 builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+    // Added this, because by default, backend server does not allow requests from other origins (like React app)
+    options.AddPolicy("AllowReactApp",
+        builder =>
+        {
+            builder.WithOrigins("https://localhost:5173") // Allow requests from this origin
+                   .AllowAnyHeader()
+                   .AllowAnyMethod();
+        });
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -43,6 +54,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
