@@ -15,7 +15,8 @@ builder.Services.AddCors(options =>
     {
         builder.WithOrigins("https://localhost:5173")
                .AllowAnyHeader()
-               .AllowAnyMethod();
+               .AllowAnyMethod()
+               .AllowCredentials();
     });
 });
 
@@ -36,7 +37,6 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
-// Register the RoleAndUserInitializer
 builder.Services.AddTransient<RoleAndUserInitializer>();
 
 var app = builder.Build();
@@ -51,6 +51,8 @@ app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseCors("AllowReactApp");
 
 app.MapControllers();
 app.MapFallbackToFile("/index.html");

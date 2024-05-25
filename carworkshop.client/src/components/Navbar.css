@@ -1,0 +1,31 @@
+nav {
+    background-color: #333;
+    color: rgb(65, 62, 62);
+    padding: 1rem;
+  }
+  
+  ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0;
+  }
+  
+  li {
+    margin-right: 1rem;
+  }
+  
+  a {
+    color: rgb(61, 57, 57);
+    text-decoration: none;
+  }
+  
+  button {
+    background-color: #424141;
+    color: rgb(73, 71, 71);
+    border: none;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+  }
+  

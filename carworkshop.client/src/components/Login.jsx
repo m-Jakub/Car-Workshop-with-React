@@ -1,23 +1,24 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login } from '../services/authService';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { login } from "../services/authService";
 
 function Login({ onLogin }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      await login(username, password, rememberMe);
-      onLogin();
-      navigate('/');
+      const role = await login(username, password, rememberMe);
+      onLogin(role);
+      navigate("/");
     } catch (error) {
-      setError('Invalid username or password');
+      console.error("Login error:", error);
+      setError("Invalid username or password");
     }
   };
 

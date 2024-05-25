@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-const PrivateRoute = ({ element, isAuthenticated, ...rest }) => {
+const PrivateRoute = ({ element, isAuthenticated }) => {
   return isAuthenticated ? element : <Navigate to="/login" />;
 };
 

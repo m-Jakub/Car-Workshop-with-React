@@ -12,10 +12,12 @@ namespace CarWorkshop.Server.Controllers
     public class AuthController : ControllerBase
     {
         private readonly SignInManager<AppUser> _signInManager;
+        private readonly UserManager<AppUser> _userManager;
 
-        public AuthController(SignInManager<AppUser> signInManager)
+        public AuthController(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager)
         {
             _signInManager = signInManager;
+            _userManager = userManager;
         }
 
         [HttpPost("login")]
@@ -24,19 +26,28 @@ namespace CarWorkshop.Server.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.Username!, model.Password!, model.RememberMe, false);
+                var result = await _signInManager.PasswordSignInAsync(model.Username, model.Password, model.RememberMe, false);
 
                 if (result.Succeeded)
                 {
-                    return Ok(new { success = true });
+                    var user = await _userManager.FindByNameAsync(model.Username);
+                    if (user != null)
+                    {
+                        var roles = await _userManager.GetRolesAsync(user);
+                        string userRole = roles.FirstOrDefault();
+
+                        return Ok(new { success = true, role = userRole });
+                    }
+
+                    return BadRequest(new { error = "User not found" });
                 }
 
                 return BadRequest(new { error = "Invalid login attempt" });
             }
-            
+
             return BadRequest(ModelState);
         }
-        
+
         [HttpPost("logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
