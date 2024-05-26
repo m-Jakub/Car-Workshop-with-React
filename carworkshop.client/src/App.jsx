@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
-import EmployeeManagement from "./components/EmployeeManagement";
+import EmployeeManagement from "./components/EmployeeList";
 import TicketManagement from "./components/TicketManagement";
 import Calendar from "./components/Calendar";
 import Tickets from "./components/Tickets";
