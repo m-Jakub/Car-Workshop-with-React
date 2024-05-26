@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CarWorkshop.Server.Models;
+using CarWorkshop.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,12 +25,12 @@ namespace CarWorkshop.Server.Controllers
         {
             var adminUsers = await _userManager.GetUsersInRoleAsync("Admin");
             var allUsers = _userManager.Users.ToList();
-        
+
             var employees = allUsers.Except(adminUsers).ToList();
-        
+
             var totalEmployees = employees.Count;
             var pagedEmployees = employees.Skip((page - 1) * pageSize).Take(pageSize).ToList();
-        
+
             var model = new EmployeeManagementVM
             {
                 Employees = pagedEmployees,
@@ -37,26 +38,40 @@ namespace CarWorkshop.Server.Controllers
                 PageSize = pageSize,
                 TotalEmployees = totalEmployees
             };
-        
+
             return Ok(model);
         }
 
-        // [HttpPost]
-        // public async Task<IActionResult> CreateEmployee([FromBody] CreateEmployeeVM model)
-        // {
-        //     if (ModelState.IsValid)
-        //     {
-        //         var user = new AppUser { UserName = model.Username, Email = model.Email };
-        //         var result = await _userManager.CreateAsync(user, model.Password);
+        [HttpPost]
+        public async Task<IActionResult> AddEmployee([FromBody] AddEmployeeVM model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.Password != model.ConfirmPassword)
+                {
+                    return BadRequest(new { errors = new[] { "Passwords do not match" } });
+                }
 
-        //         if (result.Succeeded)
-        //         {
-        //             return Ok(new { success = true });
-        //         }
-        //         return BadRequest(result.Errors);
-        //     }
-        //     return BadRequest(ModelState);
-        // }
+                var user = new AppUser
+                {
+                    Name = model.Name,
+                    UserName = model.Email,
+                    Email = model.Email,
+                    HourlyRate = model.HourlyRate
+                };
+
+                var result = await _userManager.CreateAsync(user, model.Password);
+
+                if (result.Succeeded)
+                {
+                    await _userManager.AddToRoleAsync(user, "Employee");
+                    return Ok(new { success = true });
+                }
+                return BadRequest(new { errors = result.Errors.Select(e => e.Description).ToArray() });
+            }
+            return BadRequest(new { errors = ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage).ToArray() });
+        }
+
 
         // [HttpDelete("{id}")]
         // public async Task<IActionResult> DeleteEmployee(string id)
