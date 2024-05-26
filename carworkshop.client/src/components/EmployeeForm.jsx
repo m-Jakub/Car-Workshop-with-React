@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-const NewEmployeeForm = ({ onEmployeeAdded }) => {
+const EmployeeForm = ({ onEmployeeAdded }) => {
   const [newEmployee, setNewEmployee] = useState({
     name: "",
     email: "",
@@ -96,9 +96,9 @@ const NewEmployeeForm = ({ onEmployeeAdded }) => {
         placeholder="Confirm Password"
         required
       />
-      <button type="submit">Add New Employee</button>
+      <button type="submit">Confirm</button>
     </form>
   );
 };
 
-export default NewEmployeeForm;
+export default EmployeeForm;

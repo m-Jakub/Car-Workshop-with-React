@@ -3,8 +3,9 @@ using System.Runtime.CompilerServices;
 
 namespace CarWorkshop.Server.ViewModels
 {
-    public class AddEmployeeVM
+    public class UpdateEmployeeVM
     {
+        public string? Id { get; set; }
         [Required]
         public string? Name { get; set; }
 
@@ -16,11 +17,9 @@ namespace CarWorkshop.Server.ViewModels
         [Range(0, 1000)]
         public decimal HourlyRate { get; set; }
 
-        [Required]
         [DataType(DataType.Password)]
         public string? Password { get; set; }
 
-        [Required]
         [Compare("Password", ErrorMessage = "Passwords do not match")]
         [DataType(DataType.Password)]
         public string? ConfirmPassword { get; set; }

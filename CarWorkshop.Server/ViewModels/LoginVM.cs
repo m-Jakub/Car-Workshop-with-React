@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace CarWorkshop.ViewModels
+namespace CarWorkshop.Server.ViewModels
 {
     public class LoginVM
     {

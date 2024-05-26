@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CarWorkshop.Server.Models;
-using CarWorkshop.ViewModels;
+using CarWorkshop.Server.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -73,42 +73,55 @@ namespace CarWorkshop.Server.Controllers
         }
 
 
-        // [HttpDelete("{id}")]
-        // public async Task<IActionResult> DeleteEmployee(string id)
-        // {
-        //     var user = await _userManager.FindByIdAsync(id);
-        //     if (user == null)
-        //     {
-        //         return NotFound();
-        //     }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteEmployee(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        //     var result = await _userManager.DeleteAsync(user);
-        //     if (result.Succeeded)
-        //     {
-        //         return Ok(new { success = true });
-        //     }
-        //     return BadRequest(result.Errors);
-        // }
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok(new { success = true });
+            }
+            return BadRequest(result.Errors);
+        }
 
-        // [HttpPut("{id}")]
-        // public async Task<IActionResult> UpdateEmployee(string id, [FromBody] UpdateEmployeeVM model)
-        // {
-        //     var user = await _userManager.FindByIdAsync(id);
-        //     if (user == null)
-        //     {
-        //         return NotFound();
-        //     }
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateEmployee(string id, [FromBody] UpdateEmployeeVM model)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
 
-        //     user.UserName = model.Username;
-        //     user.Email = model.Email;
+            user.Name = model.Name;
+            user.UserName = model.Email;
+            user.Email = model.Email;
+            user.HourlyRate = model.HourlyRate;
 
-        //     var result = await _userManager.UpdateAsync(user);
-        //     if (result.Succeeded)
-        //     {
-        //         return Ok(new { success = true });
-        //     }
-        //     return BadRequest(result.Errors);
-        // }
+            if (!string.IsNullOrEmpty(model.Password))
+            {
+                if (model.Password != model.ConfirmPassword)
+                {
+                    return BadRequest(new { errors = new[] { "Passwords do not match" } });
+                }
+
+                var passwordHash = _userManager.PasswordHasher.HashPassword(user, model.Password);
+                user.PasswordHash = passwordHash;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Ok(new { success = true });
+            }
+            return BadRequest(result.Errors);
+        }
 
     }
 }

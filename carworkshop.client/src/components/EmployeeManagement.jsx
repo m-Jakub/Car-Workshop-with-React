@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import NewEmployeeForm from "./NewEmployeeForm";
+import EmployeeForm from "./EmployeeForm";
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
@@ -8,6 +8,7 @@ const EmployeeList = () => {
   const [pageSize, setPageSize] = useState(10);
   const [totalEmployees, setTotalEmployees] = useState(0);
   const [showForm, setShowForm] = useState(false);
+  const [employeeToUpdate, setEmployeeToUpdate] = useState(null);
 
   const fetchEmployees = async () => {
     const response = await axios.get(
@@ -15,6 +16,28 @@ const EmployeeList = () => {
     );
     setEmployees(response.data.employees);
     setTotalEmployees(response.data.totalEmployees);
+  };
+
+  const deleteEmployee = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this employee?"
+    );
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `https://localhost:7228/api/employeemanagement/${id}`
+        );
+        if (response.status === 200) {
+          fetchEmployees();
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 400) {
+          alert("Error deleting employee: " + error.response.data);
+        } else {
+          console.error(error);
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -40,8 +63,17 @@ const EmployeeList = () => {
               <td>{employee.email}</td>
               <td>{employee.hourlyRate}</td>
               <td>
-                <button>Edit</button>
-                <button>Delete</button>
+                <button
+                  onClick={() => {
+                    setEmployeeToUpdate(employee);
+                    setShowForm(true);
+                  }}
+                >
+                  Update
+                </button>
+                <button onClick={() => deleteEmployee(employee.id)}>
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
@@ -58,10 +90,10 @@ const EmployeeList = () => {
         >
           Next
         </button>
-        <button onClick={() => setShowForm(!showForm)}>
+        <button onClick={() => { setShowForm(!showForm); setEmployeeToUpdate(null); }}>
           {showForm ? "Cancel" : "Add New Employee"}
         </button>
-        {showForm && <NewEmployeeForm onEmployeeAdded={fetchEmployees} />}
+        {showForm && <EmployeeForm employee={employeeToUpdate} onEmployeeSaved={fetchEmployees} />}
       </div>
     </div>
   );
