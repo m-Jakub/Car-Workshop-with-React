@@ -9,5 +9,8 @@ namespace CarWorkshop.Server.Data
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
         }
+
+        public DbSet<Ticket> Ticket { get; set; }
+        public DbSet<Part> Part { get; set; }
     }
 }

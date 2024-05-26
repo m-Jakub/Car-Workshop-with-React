@@ -4,6 +4,7 @@ using CarWorkshop.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CarWorkshop.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240526161218_AddTicketAndPart")]
+    partial class AddTicketAndPart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,7 +123,7 @@ namespace CarWorkshop.Server.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("Part");
+                    b.ToTable("Parts");
                 });
 
             modelBuilder.Entity("CarWorkshop.Server.Models.Ticket", b =>
@@ -175,7 +178,7 @@ namespace CarWorkshop.Server.Migrations
 
                     b.HasKey("TicketId");
 
-                    b.ToTable("Ticket");
+                    b.ToTable("Tickets");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
