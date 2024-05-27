@@ -35,8 +35,9 @@ namespace CarWorkshop.Server.Controllers
                     {
                         var roles = await _userManager.GetRolesAsync(user);
                         string userRole = roles.FirstOrDefault();
+                        string userName = user.Name;
 
-                        return Ok(new { success = true, role = userRole });
+                        return Ok(new { success = true, role = userRole, name = userName });
                     }
 
                     return BadRequest(new { error = "User not found" });

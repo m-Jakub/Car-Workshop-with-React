@@ -13,8 +13,8 @@ function Login({ onLogin }) {
     e.preventDefault();
 
     try {
-      const role = await login(username, password, rememberMe);
-      onLogin(role);
+      const { role, name } = await login(username, password, rememberMe);
+      onLogin(role, name);
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);

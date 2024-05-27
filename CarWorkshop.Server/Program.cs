@@ -13,7 +13,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", builder =>
     {
-        builder.WithOrigins("https://localhost:5173")
+        builder.WithOrigins("https://localhost:5173") // Adjust this if your frontend is served from a different origin
                .AllowAnyHeader()
                .AllowAnyMethod()
                .AllowCredentials();
@@ -49,7 +49,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseCors("AllowReactApp");
 
 app.UseAuthentication();

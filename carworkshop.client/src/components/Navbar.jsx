@@ -7,6 +7,9 @@ function Navbar({ onLogout, userRole }) {
   return (
     <nav>
       <ul>
+        <li>
+          <Link to="/">Home</Link>
+        </li>
         {userRole === "Admin" && (
           <>
             <li>

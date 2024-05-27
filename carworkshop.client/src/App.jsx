@@ -8,31 +8,29 @@ import Calendar from "./components/Calendar";
 import { logout } from "./services/authService";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userRole, setUserRole] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    JSON.parse(localStorage.getItem("authStatus")) || false
+  );
+  const [userRole, setUserRole] = useState(localStorage.getItem("userRole") || "");
+  const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
 
-  useEffect(() => {
-    const authStatus = localStorage.getItem("authStatus");
-    const role = localStorage.getItem("userRole");
-    if (authStatus) {
-      setIsAuthenticated(JSON.parse(authStatus));
-      setUserRole(role);
-    }
-  }, []);
-
-  const handleLogin = (role) => {
+  const handleLogin = (role, name) => {
     setIsAuthenticated(true);
     setUserRole(role);
+    setUserName(name);
     localStorage.setItem("authStatus", true);
     localStorage.setItem("userRole", role);
+    localStorage.setItem("userName", name);
   };
 
   const handleLogout = async () => {
     await logout();
     setIsAuthenticated(false);
     setUserRole("");
+    setUserName("");
     localStorage.removeItem("authStatus");
     localStorage.removeItem("userRole");
+    localStorage.removeItem("userName");
   };
 
   return (
@@ -47,11 +45,7 @@ function App() {
               <Route
                 path="/"
                 element={
-                  isAuthenticated ? (
-                    <Home userRole={userRole} />
-                  ) : (
-                    <Login onLogin={handleLogin} />
-                  )
+                  <Home userRole={userRole} userName={userName} />
                 }
               />
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
@@ -80,9 +74,9 @@ function App() {
   );
 }
 
-const Home = ({ userRole }) => (
+const Home = ({ userRole, userName }) => (
   <div>
-    <h1>Welcome, {userRole}</h1>
+    <h1>Welcome, {userName}!</h1>
   </div>
 );
 

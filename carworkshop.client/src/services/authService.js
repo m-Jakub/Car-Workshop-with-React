@@ -7,7 +7,7 @@ export const login = async (username, password, rememberMe) => {
   try {
     const response = await axios.post(`${API_URL}/login`, { username, password, rememberMe }, { withCredentials: true });
     if (response.data.success) {
-      return response.data.role;
+      return { role: response.data.role, name: response.data.name}
     } else {
       throw new Error('Login failed');
     }
