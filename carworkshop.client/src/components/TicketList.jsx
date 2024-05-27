@@ -1,40 +1,49 @@
-import { useNavigate } from 'react-router-dom';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import TicketForm from "./TicketForm";
 
-function TicketList() {
+const TicketList = () => {
   const [tickets, setTickets] = useState([]);
-  const navigate = useNavigate(); // used to navigate between pages
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalTickets, setTotalTickets] = useState(0);
+  const [showForm, setShowForm] = useState(false);
+  const [ticketToUpdate, setTicketToUpdate] = useState(null);
+
+  const fetchTickets = async () => {
+    const response = await axios.get(
+      `https://localhost:7228/api/ticket?page=${page}&pageSize=${pageSize}`
+    );
+    setTickets(response.data.tickets);
+    setTotalTickets(response.data.totalTickets);
+  };
+
+  const deleteTicket = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this ticket?"
+    );
+    if (confirmDelete) {
+      try {
+        const response = await axios.delete(
+          `https://localhost:7228/api/ticket/${id}`
+        );
+        if (response.status === 204) {
+          fetchTickets();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
 
   useEffect(() => {
-    fetch("api/Ticket")
-      .then((response) => response.json())
-      .then((data) => setTickets(data));
-  }, []);
-
-  function handleViewParts(id) {
-    navigate(`/parts/${id}`);
-  }
-
-  function handleEdit(id) {
-    navigate(`/edit/${id}`);
-  }
-
-  function handleDetails(id) {
-    navigate(`/details/${id}`);
-  }
-
-  function handleDelete(id) {
-    if (window.confirm("Are you sure you want to delete this ticket?")) {
-      fetch(`api/Ticket/${id}`, { method: "DELETE" }).then(() => {
-        setTickets(tickets.filter((ticket) => ticket.ticketId !== id));
-      });
-    }
-  }
+    fetchTickets();
+  }, [page, pageSize]);
 
   return (
     <div>
-      <h1>Ticket Management</h1>
-      <table className="table">
+      <h2>Ticket Management</h2>
+      <table>
         <thead>
           <tr>
             <th>Brand</th>
@@ -57,23 +66,15 @@ function TicketList() {
               <td>{ticket.model}</td>
               <td>{ticket.registrationId}</td>
               <td>{ticket.description}</td>
-              <td>{ticket.employeeName}</td>
+              <td>{ticket.employeeName || "Not assigned"}</td>
               <td>{ticket.state}</td>
               <td>{ticket.estimateDescription}</td>
               <td>{ticket.expectedCost}</td>
               <td>{ticket.estimateAccepted ? "Yes" : "No"}</td>
               <td>{ticket.pricePaid || "-"}</td>
               <td>
-                <button onClick={() => handleViewParts(ticket.ticketId)}>
-                  Parts
-                </button>
-                <button onClick={() => handleEdit(ticket.ticketId)}>
-                  Edit
-                </button>
-                <button onClick={() => handleDetails(ticket.ticketId)}>
-                  Details
-                </button>
-                <button onClick={() => handleDelete(ticket.ticketId)}>
+                <button onClick={() => setTicketToUpdate(ticket)}>Edit</button>
+                <button onClick={() => deleteTicket(ticket.ticketId)}>
                   Delete
                 </button>
               </td>
@@ -81,8 +82,31 @@ function TicketList() {
           ))}
         </tbody>
       </table>
+      <div>
+        Page {page} of {Math.ceil(totalTickets / pageSize)}
+        <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+          Previous
+        </button>
+        <button
+          onClick={() => setPage(page + 1)}
+          disabled={page === Math.ceil(totalTickets / pageSize)}
+        >
+          Next
+        </button>
+        <button
+          onClick={() => {
+            setShowForm(!showForm);
+            setTicketToUpdate(null);
+          }}
+        >
+          {showForm ? "Cancel" : "Add New Ticket"}
+        </button>
+        {showForm && (
+          <TicketForm ticket={ticketToUpdate} onTicketSaved={fetchTickets} />
+        )}
+      </div>
     </div>
   );
-}
+};
 
 export default TicketList;

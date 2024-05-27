@@ -25,6 +25,8 @@ namespace CarWorkshop.Server.Models
         public string Description { get; set; }
 
         public string? EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
+        public AppUser? Employee { get; set; }
 
         [DisplayName("Assigned Employee")]
         public string? EmployeeName { get; set; } = "Not assigned";

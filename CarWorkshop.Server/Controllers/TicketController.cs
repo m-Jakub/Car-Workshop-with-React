@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using CarWorkshop.Server.Data;
 using CarWorkshop.Server.Models;
+using CarWorkshop.Server.ViewModels;
 
 namespace CarWorkshop.Server.Controllers
 {
@@ -19,10 +20,39 @@ namespace CarWorkshop.Server.Controllers
 
         // GET: api/Ticket
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Ticket>>> GetTickets()
+        public async Task<ActionResult<TicketManagementVM>> GetTickets(int page = 1, int pageSize = 10)
         {
-            return await _context.Ticket.ToListAsync();
+            int totalTickets = await _context.Ticket.CountAsync();
+            var tickets = await _context.Ticket
+                .Include(t => t.Employee)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var ticketVMs = tickets.Select(ticket => new Ticket
+            {
+                TicketId = ticket.TicketId,
+                Brand = ticket.Brand,
+                Model = ticket.Model,
+                RegistrationId = ticket.RegistrationId,
+                Description = ticket.Description,
+                EmployeeName = ticket.Employee?.UserName ?? "Not assigned",
+                State = ticket.State,
+                EstimateDescription = ticket.EstimateDescription,
+                ExpectedCost = ticket.ExpectedCost,
+                EstimateAccepted = ticket.EstimateAccepted,
+                PricePaid = ticket.PricePaid
+            }).ToList();
+
+            return new TicketManagementVM
+            {
+                Tickets = ticketVMs,
+                Page = page,
+                PageSize = pageSize,
+                TotalTickets = totalTickets
+            };
         }
+
 
         // GET: api/Ticket/5
         [HttpGet("{id}")]
