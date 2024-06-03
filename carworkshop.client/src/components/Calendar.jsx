@@ -8,7 +8,7 @@ const Calendar = () => {
     useEffect(() => {
         const fetchTimeSlots = async () => {
             try {
-                const response = await axios.get('/api/Calendar/timeslots');
+                const response = await axios.get('https://localhost:7228/api/Calendar/timeslots');
                 setTimeSlots(response.data);
             } catch (error) {
                 console.error('Error fetching time slots:', error);
@@ -17,8 +17,11 @@ const Calendar = () => {
 
         const fetchEmployeeId = async () => {
             try {
-                const response = await axios.get('/api/Calendar/user');
+                const response = await axios.get('https://localhost:7228/api/Calendar/user');
                 setEmployeeId(response.data.id);
+                console.log(response.data.id);
+                console.log(employeeId);
+                console.log(response);
             } catch (error) {
                 console.error('Error fetching employee ID:', error);
             }

@@ -14,23 +14,41 @@ function App() {
   const [userRole, setUserRole] = useState(localStorage.getItem("userRole") || "");
   const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
 
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') { // to clear local storage in development mode
+      localStorage.removeItem("authStatus");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("userName");
+      sessionStorage.clear();
+    } else {
+      const authStatus = JSON.parse(localStorage.getItem("authStatus")) || false;
+      setIsAuthenticated(authStatus);
+      setUserRole(localStorage.getItem("userRole") || "");
+      setUserName(localStorage.getItem("userName") || "");
+    }
+  }, []);
+
   const handleLogin = (role, name) => {
     setIsAuthenticated(true);
     setUserRole(role);
     setUserName(name);
-    localStorage.setItem("authStatus", true);
+    localStorage.setItem("authStatus", JSON.stringify(true));
     localStorage.setItem("userRole", role);
     localStorage.setItem("userName", name);
   };
 
   const handleLogout = async () => {
-    await logout();
-    setIsAuthenticated(false);
-    setUserRole("");
-    setUserName("");
-    localStorage.removeItem("authStatus");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userName");
+    try {
+      await logout();
+      setIsAuthenticated(false);
+      setUserRole("");
+      setUserName("");
+      localStorage.removeItem("authStatus");
+      localStorage.removeItem("userRole");
+      localStorage.removeItem("userName");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   return (
@@ -44,9 +62,7 @@ function App() {
             <Routes>
               <Route
                 path="/"
-                element={
-                  <Home userRole={userRole} userName={userName} />
-                }
+                element={<Home userRole={userRole} userName={userName} />}
               />
               <Route path="/login" element={<Login onLogin={handleLogin} />} />
               {userRole === "Admin" && (

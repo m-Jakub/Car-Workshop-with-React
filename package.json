@@ -3,5 +3,6 @@
     "axios": "^1.7.2",
     "latest": "^0.2.0",
     "react-router-dom": "^6.23.1"
-  }
+  },
+  "proxy": "http://localhost:7228"
 }

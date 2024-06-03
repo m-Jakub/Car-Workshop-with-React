@@ -5,6 +5,7 @@ using CarWorkshop.Server.Models;
 using CarWorkshop.Server.ViewModels;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 
 namespace CarWorkshop.Server.Controllers
@@ -64,6 +65,9 @@ namespace CarWorkshop.Server.Controllers
 
                 if (result.Succeeded)
                 {
+                    var nameIdentifierClaim = new Claim(ClaimTypes.NameIdentifier, user.Id);
+                    await _userManager.AddClaimAsync(user, nameIdentifierClaim);
+
                     await _userManager.AddToRoleAsync(user, "Employee");
                     return Ok(new { success = true });
                 }

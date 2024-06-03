@@ -11,7 +11,6 @@ using CarWorkshop.Server.Models;
 
 namespace CarWorkshop.Server.Controllers
 {
-    [Authorize(Roles = "Employee")]
     [Route("api/[controller]")]
     [ApiController]
     public class CalendarController : ControllerBase
@@ -123,8 +122,9 @@ namespace CarWorkshop.Server.Controllers
             {
                 return NotFound();
             }
-            return Ok(user);
+            return Ok(new { id = user.Id });
         }
+
 
     }
 

@@ -19,7 +19,9 @@ export const login = async (username, password, rememberMe) => {
 export const logout = async () => {
   try {
     await axios.post(`${API_URL}/logout`, {}, { withCredentials: true });
+    console.log('Logged out');
   } catch (error) {
+    console.error('Error logging out:', error);
     throw error;
   }
 };
