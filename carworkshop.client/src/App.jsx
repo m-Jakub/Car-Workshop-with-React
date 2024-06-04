@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import axiosInstance from "./services/axiosInstance";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import EmployeeManagement from "./components/EmployeeList";
@@ -8,25 +14,51 @@ import Calendar from "./components/Calendar";
 import { logout } from "./services/authService";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(
-    JSON.parse(localStorage.getItem("authStatus")) || false
-  );
-  const [userRole, setUserRole] = useState(localStorage.getItem("userRole") || "");
-  const [userName, setUserName] = useState(localStorage.getItem("userName") || "");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userRole, setUserRole] = useState("");
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') { // to clear local storage in development mode
+    if (process.env.NODE_ENV === "development") {
+      // Clear local storage in development mode
       localStorage.removeItem("authStatus");
       localStorage.removeItem("userRole");
       localStorage.removeItem("userName");
       sessionStorage.clear();
     } else {
-      const authStatus = JSON.parse(localStorage.getItem("authStatus")) || false;
-      setIsAuthenticated(authStatus);
-      setUserRole(localStorage.getItem("userRole") || "");
-      setUserName(localStorage.getItem("userName") || "");
+      const authStatus = JSON.parse(localStorage.getItem("authStatus"));
+      const storedUserRole = localStorage.getItem("userRole");
+      const storedUserName = localStorage.getItem("userName");
+
+      if (authStatus && storedUserRole && storedUserName) {
+        setIsAuthenticated(authStatus);
+        setUserRole(storedUserRole);
+        setUserName(storedUserName);
+      }
     }
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const checkAuthStatus = async () => {
+        try {
+          const response = await axiosInstance.get("/auth/status");
+          if (response.data.isAuthenticated) {
+            setIsAuthenticated(true);
+            setUserRole(response.data.role);
+            setUserName(response.data.name);
+            localStorage.setItem("authStatus", JSON.stringify(true));
+            localStorage.setItem("userRole", response.data.role);
+            localStorage.setItem("userName", response.data.name);
+          }
+        } catch (error) {
+          console.error("Error checking authentication status:", error);
+        }
+      };
+
+      checkAuthStatus();
+    }
+  }, [isAuthenticated]);
 
   const handleLogin = (role, name) => {
     setIsAuthenticated(true);
@@ -57,34 +89,36 @@ function App() {
         {isAuthenticated && (
           <Navbar onLogout={handleLogout} userRole={userRole} />
         )}
-        {isAuthenticated ? (
-          userRole ? (
-            <Routes>
+        <Routes>
+          {isAuthenticated ? (
+            <>
               <Route
                 path="/"
                 element={<Home userRole={userRole} userName={userName} />}
               />
-              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="/login" element={<Navigate to="/" />} />
               {userRole === "Admin" && (
-                <Route
-                  path="/employee-management"
-                  element={<EmployeeManagement />}
-                />
-              )}
-              {userRole === "Admin" && (
-                <Route
-                  path="/ticket-management"
-                  element={<TicketManagement />}
-                />
+                <>
+                  <Route
+                    path="/employee-management"
+                    element={<EmployeeManagement />}
+                  />
+                  <Route
+                    path="/ticket-management"
+                    element={<TicketManagement />}
+                  />
+                </>
               )}
               <Route path="/calendar" element={<Calendar />} />
-            </Routes>
+              <Route path="*" element={<Navigate to="/" />} />
+            </>
           ) : (
-            <div>Loading...</div>
-          )
-        ) : (
-          <Login onLogin={handleLogin} />
-        )}
+            <>
+              <Route path="/login" element={<Login onLogin={handleLogin} />} />
+              <Route path="*" element={<Navigate to="/login" />} />
+            </>
+          )}
+        </Routes>
       </div>
     </Router>
   );

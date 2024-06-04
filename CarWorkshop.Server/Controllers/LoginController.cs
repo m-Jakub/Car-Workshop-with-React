@@ -5,11 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 using CarWorkshop.Server.Models;
 using CarWorkshop.Server.ViewModels;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 namespace CarWorkshop.Server.Controllers
 {
+    [Authorize]
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly SignInManager<AppUser> _signInManager;
@@ -39,11 +41,11 @@ namespace CarWorkshop.Server.Controllers
                         string userName = user.Name;
 
                         var claims = new List<Claim>
-                        {
-                            new Claim(ClaimTypes.NameIdentifier, user.Id),
-                            new Claim(ClaimTypes.Name, user.Name),
-                            new Claim(ClaimTypes.Role, userRole)
-                        };
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id),
+                        new Claim(ClaimTypes.Name, user.Name),
+                        new Claim(ClaimTypes.Role, userRole)
+                    };
                         await _signInManager.SignInWithClaimsAsync(user, model.RememberMe, claims);
 
                         return Ok(new { success = true, role = userRole, name = userName });
@@ -58,11 +60,24 @@ namespace CarWorkshop.Server.Controllers
             return BadRequest(ModelState);
         }
 
+        [HttpGet("status")]
+        public async Task<IActionResult> GetStatus()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var user = await _userManager.FindByIdAsync(userId);
+                var role = User.IsInRole("Admin") ? "Admin" : "Employee";
+                var name = user.Name;
+                return Ok(new { isAuthenticated = true, role, name });
+            }
+            return Ok(new { isAuthenticated = false });
+        }
+
         [HttpPost("logout")]
-        [Authorize]
         public async Task<IActionResult> Logout()
         {
-            await _signInManager.SignOutAsync();
+            await HttpContext.SignOutAsync(IdentityConstants.ApplicationScheme);
             return Ok(new { success = true });
         }
     }

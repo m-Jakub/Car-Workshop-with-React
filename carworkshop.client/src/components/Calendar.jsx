@@ -1,34 +1,27 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "../services/axiosInstance";
 
 const Calendar = () => {
   const [timeSlots, setTimeSlots] = useState({});
   const [employeeId, setEmployeeId] = useState(null);
 
   useEffect(() => {
-    const axiosInstance = axios.create({
-      baseURL: "https://localhost:7228/api",
-      withCredentials: true,
-    });
-
     const fetchTimeSlots = async () => {
       try {
-        const response = await axiosInstance.get("/Calendar/timeslots");
+        const response = await axiosInstance.get('/Calendar/timeslots');
         setTimeSlots(response.data);
       } catch (error) {
-        console.error("Error fetching time slots:", error);
+        console.error('Error fetching time slots:', error);
       }
     };
 
     const fetchEmployeeId = async () => {
       try {
-        const response = await axiosInstance.get("/Calendar/user");
+        const response = await axiosInstance.get('/Calendar/user');
         setEmployeeId(response.data.id);
         console.log(response.data.id);
-        console.log(employeeId);
-        console.log(response);
       } catch (error) {
-        console.error("Error fetching employee ID:", error);
+        console.error('Error fetching employee ID:', error);
       }
     };
 
@@ -40,8 +33,8 @@ const Calendar = () => {
     const existingTimeSlot = timeSlots[`${dayOfWeek}-${hour}`];
 
     if (existingTimeSlot) {
-      await axios.delete(
-        `https://localhost:7228/api/Calendar/DeleteTimeSlot/${existingTimeSlot.timeSlotId}`
+      await axiosInstance.delete(
+        `/Calendar/DeleteTimeSlot/${existingTimeSlot.timeSlotId}`
       );
       setTimeSlots((prev) => {
         const updated = { ...prev };
@@ -56,10 +49,10 @@ const Calendar = () => {
         availabilityStatus: "Available",
       };
 
-      const response = await axios.post(
-        "https://localhost:7228/api/Calendar/CreateTimeSlot",
+      const response = await axiosInstance.post(
+        "/Calendar/CreateTimeSlot",
         newTimeSlot
-        );
+      );
       setTimeSlots((prev) => ({
         ...prev,
         [`${dayOfWeek}-${hour}`]: {
