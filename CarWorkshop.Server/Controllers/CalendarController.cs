@@ -11,6 +11,7 @@ using CarWorkshop.Server.Models;
 
 namespace CarWorkshop.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CalendarController : ControllerBase

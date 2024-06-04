@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using CarWorkshop.Server.Models;
 using CarWorkshop.Server.ViewModels;
+using System.Security.Claims;
 
 namespace CarWorkshop.Server.Controllers
 {
@@ -36,6 +37,14 @@ namespace CarWorkshop.Server.Controllers
                         var roles = await _userManager.GetRolesAsync(user);
                         string userRole = roles.FirstOrDefault();
                         string userName = user.Name;
+
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.NameIdentifier, user.Id),
+                            new Claim(ClaimTypes.Name, user.Name),
+                            new Claim(ClaimTypes.Role, userRole)
+                        };
+                        await _signInManager.SignInWithClaimsAsync(user, model.RememberMe, claims);
 
                         return Ok(new { success = true, role = userRole, name = userName });
                     }

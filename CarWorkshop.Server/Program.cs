@@ -38,6 +38,15 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.LoginPath = "/login";
+    options.AccessDeniedPath = "/accessdenied";
+    options.SlidingExpiration = true;
+});
+
 builder.Services.AddTransient<RoleAndUserInitializer>();
 
 var app = builder.Build();
