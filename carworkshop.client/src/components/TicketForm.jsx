@@ -1,13 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import authService from "../services/authService";
 
 const TicketForm = ({ ticket, onTicketSaved }) => {
   const [formState, setFormState] = useState({
-    brand: '',
-    model: '',
-    registrationId: '',
-    description: '',
+    brand: "",
+    model: "",
+    registrationId: "",
+    description: "",
   });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (ticket) {
@@ -26,20 +30,31 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      if (!authService.isAuthenticated()) {
+        navigate("/login");
+        return;
+      }
+
       if (ticket) {
-        await axios.put(`https://localhost:7228/api/ticket/${ticket.ticketId}`, formState);
+        await axios.put(
+          `https://localhost:7228/api/ticket/${ticket.ticketId}`,
+          formState,
+          { withCredentials: true }
+        );
       } else {
-        await axios.post('https://localhost:7228/api/ticket', formState);
+        await axios.post("https://localhost:7228/api/ticket", formState, {
+          withCredentials: true,
+        });
       }
       onTicketSaved();
       setFormState({
-        brand: '',
-        model: '',
-        registrationId: '',
-        description: '',
+        brand: "",
+        model: "",
+        registrationId: "",
+        description: "",
       });
     } catch (error) {
-      console.error('Error saving ticket', error);
+      console.error("Error saving ticket", error);
     }
   };
 
@@ -91,7 +106,7 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
       </div>
       <div className="form-group">
         <button type="submit" className="btn btn-primary">
-          {ticket ? 'Update' : 'Create'} Ticket
+          {ticket ? "Update" : "Create"} Ticket
         </button>
       </div>
     </form>

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Threading.Tasks;
 using CarWorkshop.Server.Data;
 using CarWorkshop.Server.Models;
@@ -7,6 +9,7 @@ using CarWorkshop.Server.ViewModels;
 
 namespace CarWorkshop.Server.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class TicketController : ControllerBase
@@ -53,7 +56,6 @@ namespace CarWorkshop.Server.Controllers
             };
         }
 
-
         // GET: api/Ticket/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Ticket>> GetTicket(int id)
@@ -70,6 +72,7 @@ namespace CarWorkshop.Server.Controllers
 
         // POST: api/Ticket
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Ticket>> CreateTicket(Ticket ticket)
         {
             _context.Ticket.Add(ticket);
@@ -80,6 +83,7 @@ namespace CarWorkshop.Server.Controllers
 
         // PUT: api/Ticket/5
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateTicket(int id, Ticket ticket)
         {
             if (id != ticket.TicketId)
@@ -100,6 +104,7 @@ namespace CarWorkshop.Server.Controllers
 
         // DELETE: api/Ticket/5
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteTicket(int id)
         {
             var ticket = await _context.Ticket.FindAsync(id);
@@ -114,9 +119,33 @@ namespace CarWorkshop.Server.Controllers
             return NoContent();
         }
 
+        [HttpPost("accept/{ticketId}")]
+        [Authorize(Roles = "Employee")]
+        public async Task<IActionResult> AcceptTicket(int ticketId, [FromBody] AcceptTicketModel model)
+        {
+            var ticket = await _context.Ticket.FindAsync(ticketId);
+            if (ticket == null)
+            {
+                return NotFound(new { success = false, message = "Ticket not found" });
+            }
+
+            ticket.EmployeeId = model.EmployeeId;
+            ticket.State = "In Progress";
+            ticket.EmployeeName = User.Identity.Name;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+
         private bool TicketExists(int id)
         {
             return _context.Ticket.Any(e => e.TicketId == id);
         }
+    }
+
+    public class AcceptTicketModel
+    {
+        public string EmployeeId { get; set; }
     }
 }

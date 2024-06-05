@@ -8,20 +8,24 @@ const Calendar = () => {
   useEffect(() => {
     const fetchTimeSlots = async () => {
       try {
-        const response = await axiosInstance.get('/Calendar/timeslots');
-        setTimeSlots(response.data);
+        const response = await axiosInstance.get("/Calendar/timeslots");
+        const slots = response.data.reduce((acc, slot) => {
+          acc[`${slot.dayOfWeek}-${slot.hour}`] = slot;
+          return acc;
+        }, {});
+        setTimeSlots(slots);
       } catch (error) {
-        console.error('Error fetching time slots:', error);
+        console.error("Error fetching time slots:", error);
       }
     };
 
     const fetchEmployeeId = async () => {
       try {
-        const response = await axiosInstance.get('/Calendar/user');
+        const response = await axiosInstance.get("/Calendar/user");
         setEmployeeId(response.data.id);
         console.log(response.data.id);
       } catch (error) {
-        console.error('Error fetching employee ID:', error);
+        console.error("Error fetching employee ID:", error);
       }
     };
 

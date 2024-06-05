@@ -105,11 +105,19 @@ function App() {
                   />
                   <Route
                     path="/ticket-management"
-                    element={<TicketManagement />}
+                    element={<TicketManagement userRole={userRole} />}
                   />
                 </>
               )}
-              <Route path="/calendar" element={<Calendar />} />
+              {userRole === "Employee" && (
+                <>
+                  <Route path="/calendar" element={<Calendar />} />
+                  <Route
+                    path="/tickets"
+                    element={<TicketManagement userRole={userRole} />}
+                  />
+                </>
+              )}
               <Route path="*" element={<Navigate to="/" />} />
             </>
           ) : (

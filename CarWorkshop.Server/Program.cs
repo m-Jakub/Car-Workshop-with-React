@@ -2,6 +2,7 @@ using CarWorkshop.Server.Models;
 using CarWorkshop.Server.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,9 +41,17 @@ builder.Services.AddIdentity<AppUser, IdentityRole>(options =>
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
+    options.Events = new CookieAuthenticationEvents
+    {
+        OnRedirectToLogin = context =>
+        {
+            context.Response.StatusCode = 401;
+            return Task.CompletedTask;
+        },
+    };
     options.Cookie.HttpOnly = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-    options.LoginPath = "/login";
+    options.LoginPath = "/api/auth/login";
     options.AccessDeniedPath = "/accessdenied";
     options.SlidingExpiration = true;
 });
