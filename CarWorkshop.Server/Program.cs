@@ -3,6 +3,7 @@ using CarWorkshop.Server.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,33 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/accessdenied";
     options.SlidingExpiration = true;
 });
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("cookieAuth", new OpenApiSecurityScheme
+    {
+        Name = "Cookie",
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Scheme = "cookieAuth"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "cookieAuth"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
 
 builder.Services.AddTransient<RoleAndUserInitializer>();
 

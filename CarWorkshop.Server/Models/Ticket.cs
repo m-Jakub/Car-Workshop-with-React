@@ -50,7 +50,7 @@ namespace CarWorkshop.Server.Models
 
         [DisplayName("Price Paid")]
         [Column(TypeName = "decimal(18, 2)")]
-        public decimal PricePaid { get; set; }
+        public decimal? PricePaid { get; set; }
     }
 
     public class Part

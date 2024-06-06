@@ -10,6 +10,7 @@ using System.Security.Claims;
 
 namespace CarWorkshop.Server.Controllers
 {
+    [Authorize (Roles = "Admin")]
     [ApiController]
     [Route("api/[controller]")]
     public class EmployeeManagementController : ControllerBase

@@ -88,19 +88,31 @@ namespace CarWorkshop.Server.Controllers
         {
             if (id != ticket.TicketId)
             {
-                return BadRequest();
+                return BadRequest("Ticket ID mismatch.");
             }
 
-            if (!TicketExists(id))
+            var existingTicket = await _context.Ticket.FindAsync(id);
+            if (existingTicket == null)
             {
-                return NotFound();
+                return NotFound("Ticket not found.");
             }
 
-            _context.Entry(ticket).State = EntityState.Modified;
+            existingTicket.Brand = ticket.Brand;
+            existingTicket.Model = ticket.Model;
+            existingTicket.RegistrationId = ticket.RegistrationId;
+            existingTicket.Description = ticket.Description;
+            existingTicket.State = ticket.State;
+            existingTicket.EstimateDescription = ticket.EstimateDescription;
+            existingTicket.ExpectedCost = ticket.ExpectedCost;
+            existingTicket.EstimateAccepted = ticket.EstimateAccepted;
+            existingTicket.PricePaid = ticket.PricePaid;
+
+            _context.Entry(existingTicket).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
+
 
         // DELETE: api/Ticket/5
         [HttpDelete("{id}")]

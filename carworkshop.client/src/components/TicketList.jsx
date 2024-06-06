@@ -127,7 +127,12 @@ const TicketList = ({ userRole }) => {
                   <td>
                     {userRole === "Admin" ? (
                       <>
-                        <button onClick={() => setTicketToUpdate(ticket)}>
+                        <button
+                          onClick={() => {
+                            setTicketToUpdate(ticket);
+                            setShowForm(true);
+                          }}
+                        >
                           Edit
                         </button>
                         <button onClick={() => deleteTicket(ticket.ticketId)}>
@@ -171,7 +176,10 @@ const TicketList = ({ userRole }) => {
             {showForm && userRole === "Admin" && (
               <TicketForm
                 ticket={ticketToUpdate}
-                onTicketSaved={fetchTickets}
+                onTicketSaved={() => {
+                  fetchTickets();
+                  setShowForm(false);
+                }}
               />
             )}
           </div>
