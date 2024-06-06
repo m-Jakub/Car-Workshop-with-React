@@ -31,7 +31,7 @@ namespace CarWorkshop.Server.Models
         [DisplayName("Assigned Employee")]
         public string? EmployeeName { get; set; } = "Not assigned";
 
-        public List<int> CalendarEventIds { get; set; } = new List<int>();
+        public List<int> TimeSlotIds { get; set; } = new List<int>();
 
         [Required]
         public string State { get; set; } = "Created";

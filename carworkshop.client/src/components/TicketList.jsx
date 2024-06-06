@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TicketForm from "./TicketForm";
+import TicketAssignmentCalendar from "./TicketAssignmentCalendar";
 
 const TicketList = ({ userRole }) => {
   const [tickets, setTickets] = useState([]);
@@ -10,6 +11,7 @@ const TicketList = ({ userRole }) => {
   const [showForm, setShowForm] = useState(false);
   const [ticketToUpdate, setTicketToUpdate] = useState(null);
   const [employeeId, setEmployeeId] = useState(null);
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   useEffect(() => {
     const fetchEmployeeId = async () => {
@@ -40,14 +42,19 @@ const TicketList = ({ userRole }) => {
     }
   };
 
-  const acceptTicket = async (ticketId) => {
+  const acceptTicket = (ticketId) => {
+    setSelectedTicket(ticketId);
+  };
+
+  const handleConfirmAssignment = async (selectedTimeSlots) => {
     try {
       const response = await axios.post(
-        `https://localhost:7228/api/ticket/accept/${ticketId}`,
-        { employeeId },
+        `https://localhost:7228/api/ticket/accept/${selectedTicket}`,
+        { employeeId, timeSlotIds: selectedTimeSlots },
         { withCredentials: true }
       );
       if (response.status === 200) {
+        setSelectedTicket(null);
         fetchTickets();
       }
     } catch (error) {
@@ -81,82 +88,95 @@ const TicketList = ({ userRole }) => {
   return (
     <div>
       <h2>Ticket Management</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Brand</th>
-            <th>Model</th>
-            <th>Registration ID</th>
-            <th>Description</th>
-            <th>Assigned Employee</th>
-            <th>State</th>
-            <th>Estimate Description</th>
-            <th>Expected Cost</th>
-            <th>Estimate Accepted</th>
-            <th>Price Paid</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tickets.map((ticket) => (
-            <tr key={ticket.ticketId}>
-              <td>{ticket.brand}</td>
-              <td>{ticket.model}</td>
-              <td>{ticket.registrationId}</td>
-              <td>{ticket.description}</td>
-              <td>{ticket.employeeName || "Not assigned"}</td>
-              <td>{ticket.state}</td>
-              <td>{ticket.estimateDescription}</td>
-              <td>{ticket.expectedCost}</td>
-              <td>{ticket.estimateAccepted ? "Yes" : "No"}</td>
-              <td>{ticket.pricePaid || "-"}</td>
-              <td>
-                {userRole === "Admin" ? (
-                  <>
-                    <button onClick={() => setTicketToUpdate(ticket)}>
-                      Edit
-                    </button>
-                    <button onClick={() => deleteTicket(ticket.ticketId)}>
-                      Delete
-                    </button>
-                  </>
-                ) : ticket.employeeName && ticket.employeeName !== "Not assigned" ? (
-                  "-"
-                ) : (
-                  <button onClick={() => acceptTicket(ticket.ticketId)}>
-                    Accept Ticket
-                  </button>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div>
-        Page {page} of {Math.ceil(totalTickets / pageSize)}
-        <button onClick={() => setPage(page - 1)} disabled={page === 1}>
-          Previous
-        </button>
-        <button
-          onClick={() => setPage(page + 1)}
-          disabled={page === Math.ceil(totalTickets / pageSize)}
-        >
-          Next
-        </button>
-        {userRole === "Admin" && (
-          <button
-            onClick={() => {
-              setShowForm(!showForm);
-              setTicketToUpdate(null);
-            }}
-          >
-            {showForm ? "Cancel" : "Add New Ticket"}
-          </button>
-        )}
-        {showForm && userRole === "Admin" && (
-          <TicketForm ticket={ticketToUpdate} onTicketSaved={fetchTickets} />
-        )}
-      </div>
+      {selectedTicket ? (
+        <TicketAssignmentCalendar
+          selectedTicketId={selectedTicket}
+          onConfirm={handleConfirmAssignment}
+        />
+      ) : (
+        <>
+          <table>
+            <thead>
+              <tr>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>Registration ID</th>
+                <th>Description</th>
+                <th>Assigned Employee</th>
+                <th>State</th>
+                <th>Estimate Description</th>
+                <th>Expected Cost</th>
+                <th>Estimate Accepted</th>
+                <th>Price Paid</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {tickets.map((ticket) => (
+                <tr key={ticket.ticketId}>
+                  <td>{ticket.brand}</td>
+                  <td>{ticket.model}</td>
+                  <td>{ticket.registrationId}</td>
+                  <td>{ticket.description}</td>
+                  <td>{ticket.employeeName || "Not assigned"}</td>
+                  <td>{ticket.state}</td>
+                  <td>{ticket.estimateDescription}</td>
+                  <td>{ticket.expectedCost}</td>
+                  <td>{ticket.estimateAccepted ? "Yes" : "No"}</td>
+                  <td>{ticket.pricePaid || "-"}</td>
+                  <td>
+                    {userRole === "Admin" ? (
+                      <>
+                        <button onClick={() => setTicketToUpdate(ticket)}>
+                          Edit
+                        </button>
+                        <button onClick={() => deleteTicket(ticket.ticketId)}>
+                          Delete
+                        </button>
+                      </>
+                    ) : ticket.employeeName &&
+                      ticket.employeeName !== "Not assigned" ? (
+                      "-"
+                    ) : (
+                      <button onClick={() => acceptTicket(ticket.ticketId)}>
+                        Accept Ticket
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <div>
+            Page {page} of {Math.ceil(totalTickets / pageSize)}
+            <button onClick={() => setPage(page - 1)} disabled={page === 1}>
+              Previous
+            </button>
+            <button
+              onClick={() => setPage(page + 1)}
+              disabled={page === Math.ceil(totalTickets / pageSize)}
+            >
+              Next
+            </button>
+            {userRole === "Admin" && (
+              <button
+                onClick={() => {
+                  setShowForm(!showForm);
+                  setTicketToUpdate(null);
+                }}
+              >
+                {showForm ? "Cancel" : "Add New Ticket"}
+              </button>
+            )}
+            {showForm && userRole === "Admin" && (
+              <TicketForm
+                ticket={ticketToUpdate}
+                onTicketSaved={fetchTickets}
+              />
+            )}
+          </div>
+        </>
+      )}
     </div>
   );
 };

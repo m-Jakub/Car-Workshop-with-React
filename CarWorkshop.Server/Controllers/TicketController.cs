@@ -133,6 +133,20 @@ namespace CarWorkshop.Server.Controllers
             ticket.State = "In Progress";
             ticket.EmployeeName = User.Identity.Name;
 
+            if (model.TimeSlotIds != null && model.TimeSlotIds.Any())
+            {
+                ticket.TimeSlotIds = model.TimeSlotIds;
+                foreach (var timeSlotId in model.TimeSlotIds)
+                {
+                    var timeSlot = await _context.TimeSlot.FindAsync(timeSlotId);
+                    if (timeSlot != null)
+                    {
+                        timeSlot.AvailabilityStatus = "Busy";
+                        timeSlot.TicketId = ticketId;
+                    }
+                }
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok(new { success = true });
@@ -147,5 +161,6 @@ namespace CarWorkshop.Server.Controllers
     public class AcceptTicketModel
     {
         public string EmployeeId { get; set; }
+        public List<int> TimeSlotIds { get; set; }
     }
 }
