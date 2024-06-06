@@ -12,7 +12,8 @@ const EmployeeList = () => {
 
   const fetchEmployees = async () => {
     const response = await axios.get(
-      `https://localhost:7228/api/employeemanagement?page=${page}&pageSize=${pageSize}`
+      `https://localhost:7228/api/employeemanagement?page=${page}&pageSize=${pageSize}`,
+      { withCredentials: true }
     );
     setEmployees(response.data.employees);
     setTotalEmployees(response.data.totalEmployees);
@@ -25,7 +26,8 @@ const EmployeeList = () => {
     if (confirmDelete) {
       try {
         const response = await axios.delete(
-          `https://localhost:7228/api/employeemanagement/${id}`
+          `https://localhost:7228/api/employeemanagement/${id}`,
+          { withCredentials: true }
         );
         if (response.status === 200) {
           fetchEmployees();

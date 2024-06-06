@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import TicketForm from "./TicketForm";
 import TicketAssignmentCalendar from "./TicketAssignmentCalendar";
+import PartList from "./PartList";
 
 const TicketList = ({ userRole }) => {
   const [tickets, setTickets] = useState([]);
@@ -12,6 +13,8 @@ const TicketList = ({ userRole }) => {
   const [ticketToUpdate, setTicketToUpdate] = useState(null);
   const [employeeId, setEmployeeId] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
+  const [selectedTicketIdForParts, setSelectedTicketIdForParts] =
+    useState(null);
 
   useEffect(() => {
     const fetchEmployeeId = async () => {
@@ -93,6 +96,11 @@ const TicketList = ({ userRole }) => {
           selectedTicketId={selectedTicket}
           onConfirm={handleConfirmAssignment}
         />
+      ) : selectedTicketIdForParts ? (
+        <PartList
+          ticketId={selectedTicketIdForParts}
+          onBack={() => setSelectedTicketIdForParts(null)}
+        />
       ) : (
         <>
           <table>
@@ -137,6 +145,13 @@ const TicketList = ({ userRole }) => {
                         </button>
                         <button onClick={() => deleteTicket(ticket.ticketId)}>
                           Delete
+                        </button>
+                        <button
+                          onClick={() =>
+                            setSelectedTicketIdForParts(ticket.ticketId)
+                          }
+                        >
+                          Manage Parts
                         </button>
                       </>
                     ) : ticket.employeeName &&
