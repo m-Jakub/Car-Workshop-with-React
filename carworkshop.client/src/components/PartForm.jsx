@@ -15,15 +15,18 @@ const PartForm = ({ part, onPartSaved, ticketId }) => {
         name: part.name,
         amount: part.amount,
         unitPrice: part.unitPrice,
+        ticketId: ticketId,
+        partId: part.partId,
       });
     } else {
       setFormData({
         name: "",
         amount: 1,
         unitPrice: 0.0,
+        ticketId: ticketId,
       });
     }
-  }, [part]);
+  }, [part, ticketId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -41,7 +44,7 @@ const PartForm = ({ part, onPartSaved, ticketId }) => {
       if (part) {
         const response = await axios.put(
           `https://localhost:7228/api/part/${part.partId}`,
-          { ...formData, ticketId },
+          formData,
           { withCredentials: true }
         );
         if (response.status === 200 || response.status === 204) {
@@ -52,7 +55,7 @@ const PartForm = ({ part, onPartSaved, ticketId }) => {
       } else {
         const response = await axios.post(
           "https://localhost:7228/api/part",
-          { ...formData, ticketId },
+          formData,
           { withCredentials: true }
         );
         if (response.status === 200 || response.status === 201) {

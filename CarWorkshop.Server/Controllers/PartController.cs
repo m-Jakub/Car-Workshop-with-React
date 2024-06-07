@@ -72,7 +72,18 @@ namespace CarWorkshop.Server.Controllers
                 return BadRequest("Part ID mismatch.");
             }
 
-            _context.Entry(part).State = EntityState.Modified;
+            var existingPart = await _context.Part.FindAsync(id);
+            if (existingPart == null)
+            {
+                return NotFound("Part not found.");
+            }
+
+            existingPart.Name = part.Name;
+            existingPart.Amount = part.Amount;
+            existingPart.UnitPrice = part.UnitPrice;
+            existingPart.TicketId = part.TicketId;
+
+            _context.Entry(existingPart).State = EntityState.Modified;
 
             try
             {

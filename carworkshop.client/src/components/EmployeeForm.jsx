@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import authService from "../services/authService";
 
 const EmployeeForm = ({ employee, onEmployeeSaved }) => {
   const [formData, setFormData] = useState({
@@ -44,7 +45,8 @@ const EmployeeForm = ({ employee, onEmployeeSaved }) => {
       if (employee) {
         const response = await axios.put(
           `https://localhost:7228/api/employeemanagement/${employee.id}`,
-          formData
+          formData,
+          {withCredentials: true}
         );
         if (response.status === 200) {
           onEmployeeSaved();
@@ -54,7 +56,8 @@ const EmployeeForm = ({ employee, onEmployeeSaved }) => {
       } else {
         const response = await axios.post(
           "https://localhost:7228/api/employeemanagement",
-          formData
+          formData,
+          {withCredentials: true}
         );
         if (response.status === 200) {
           setFormData({
