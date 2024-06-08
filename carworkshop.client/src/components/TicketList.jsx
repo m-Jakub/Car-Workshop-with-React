@@ -129,9 +129,9 @@ const TicketList = ({ userRole }) => {
                   <td>{ticket.employeeName || "Not assigned"}</td>
                   <td>{ticket.state}</td>
                   <td>{ticket.estimateDescription}</td>
-                  <td>{ticket.expectedCost}</td>
+                  <td>{ticket.expectedCost || ""}</td>
                   <td>{ticket.estimateAccepted ? "Yes" : "No"}</td>
-                  <td>{ticket.pricePaid || "-"}</td>
+                  <td>{ticket.pricePaid || ""}</td>
                   <td>
                     {userRole === "Admin" ? (
                       <>
