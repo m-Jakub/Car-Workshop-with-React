@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,10 +18,12 @@ namespace CarWorkshop.Server.Controllers
     public class CalendarController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<CalendarController> _logger;
 
-        public CalendarController(AppDbContext context)
+        public CalendarController(AppDbContext context, ILogger<CalendarController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpGet("timeslots")]
@@ -57,10 +60,15 @@ namespace CarWorkshop.Server.Controllers
         [HttpDelete("DeleteTimeSlot/{id}")]
         public async Task<IActionResult> DeleteTimeSlot(int id)
         {
+
             var timeSlot = await _context.TimeSlot.FindAsync(id);
             if (timeSlot == null)
             {
                 return NotFound(new { success = false, error = "TimeSlot not found" });
+            }
+            if (timeSlot.AvailabilityStatus == "Busy")
+            {
+                return BadRequest(new { success = false, error = "TimeSlot is busy" });
             }
 
             _context.TimeSlot.Remove(timeSlot);
@@ -78,7 +86,14 @@ namespace CarWorkshop.Server.Controllers
             {
                 return NotFound();
             }
-            timeSlot.AvailabilityStatus = request.AvailabilityStatus;
+            if (timeSlot.AvailabilityStatus == "Busy")
+            {
+                return BadRequest();
+            }
+            else
+            {
+                timeSlot.AvailabilityStatus = request.AvailabilityStatus;
+            }
             await _context.SaveChangesAsync();
             return Ok();
         }

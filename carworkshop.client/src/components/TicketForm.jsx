@@ -38,11 +38,6 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
         model: "",
         registrationId: "",
         description: "",
-        state: "",
-        estimateDescription: "",
-        expectedCost: 0,
-        estimateAccepted: false,
-        pricePaid: 0,
       });
     }
   }, [ticket]);
@@ -101,7 +96,9 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
       }
     } catch (error) {
       if (error.response && error.response.status === 400) {
-        const serverErrors = error.response.data.errors || [error.response.data];
+        const serverErrors = error.response.data.errors || [
+          error.response.data,
+        ];
         setErrors(serverErrors);
       } else {
         setErrors(["An unexpected error occurred."]);
@@ -114,7 +111,9 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
       {errors.length > 0 && (
         <div className="error-messages">
           {errors.map((error, index) => (
-            <div key={index} style={{ color: 'red' }}>{error}</div>
+            <div key={index} style={{ color: "red" }}>
+              {error}
+            </div>
           ))}
         </div>
       )}
@@ -167,13 +166,17 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
         <>
           <div className="form-group">
             <label>State</label>
-            <input
-              type="text"
+            <select
               name="state"
               value={formState.state}
               onChange={handleChange}
               className="form-control"
-            />
+            >
+              <option value="Created">Created</option>
+              <option value="In progress">In Progress</option>
+              <option value="Done">Done</option>
+              <option value="Closed">Closed</option>
+            </select>
           </div>
           <div className="form-group">
             <label>Estimate Description</label>

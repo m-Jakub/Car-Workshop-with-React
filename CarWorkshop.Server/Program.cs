@@ -7,6 +7,9 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddConsole();
+builder.Logging.AddDebug();
+
 var connectionString = builder.Configuration.GetConnectionString("default");
 
 builder.Services.AddControllers();

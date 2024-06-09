@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System.Linq;
 using System.Threading.Tasks;
 using CarWorkshop.Server.Data;
@@ -15,10 +16,12 @@ namespace CarWorkshop.Server.Controllers
     public class TicketController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly ILogger<TicketController> _logger;
 
-        public TicketController(AppDbContext context)
+        public TicketController(AppDbContext context, ILogger<TicketController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         // GET: api/Ticket
@@ -135,6 +138,11 @@ namespace CarWorkshop.Server.Controllers
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> AcceptTicket(int ticketId, [FromBody] AcceptTicketModel model)
         {
+            if (model.TimeSlotIds == null || !model.TimeSlotIds.Any())
+            {
+                return BadRequest(new { success = false, message = "Time slots are required" });
+            }
+
             var ticket = await _context.Ticket.FindAsync(ticketId);
             if (ticket == null)
             {
@@ -145,22 +153,19 @@ namespace CarWorkshop.Server.Controllers
             ticket.State = "In Progress";
             ticket.EmployeeName = User.Identity.Name;
 
-            if (model.TimeSlotIds != null && model.TimeSlotIds.Any())
+
+            ticket.TimeSlotIds = model.TimeSlotIds;
+            foreach (var timeSlotId in model.TimeSlotIds)
             {
-                ticket.TimeSlotIds = model.TimeSlotIds;
-                foreach (var timeSlotId in model.TimeSlotIds)
+                var timeSlot = await _context.TimeSlot.FindAsync(timeSlotId);
+                if (timeSlot != null)
                 {
-                    var timeSlot = await _context.TimeSlot.FindAsync(timeSlotId);
-                    if (timeSlot != null)
-                    {
-                        timeSlot.AvailabilityStatus = "Busy";
-                        timeSlot.TicketId = ticketId;
-                    }
+                    timeSlot.AvailabilityStatus = "Busy";
+                    timeSlot.TicketId = ticketId;
                 }
             }
 
             await _context.SaveChangesAsync();
-
             return Ok(new { success = true });
         }
 
