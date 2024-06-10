@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
+import { Modal, Button } from "react-bootstrap";
 
 const TicketForm = ({ ticket, onTicketSaved }) => {
   const [formState, setFormState] = useState({
@@ -107,129 +108,138 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {errors.length > 0 && (
-        <div className="error-messages">
-          {errors.map((error, index) => (
-            <div key={index} style={{ color: "red" }}>
-              {error}
+    <Modal show={show} onHide={handleClose}>
+      <Modal.Header closeButton>
+        <Modal.Title>
+          {employee ? "Edit Ticket" : "Create New Ticket"}
+        </Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        <form onSubmit={handleSubmit}>
+          {errors.length > 0 && (
+            <div className="error-messages">
+              {errors.map((error, index) => (
+                <div key={index} style={{ color: "red" }}>
+                  {error}
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
-      )}
-      <div className="form-group">
-        <label>Brand</label>
-        <input
-          type="text"
-          name="brand"
-          value={formState.brand}
-          onChange={handleChange}
-          className="form-control"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label>Model</label>
-        <input
-          type="text"
-          name="model"
-          value={formState.model}
-          onChange={handleChange}
-          className="form-control"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label>Registration ID</label>
-        <input
-          type="text"
-          name="registrationId"
-          value={formState.registrationId}
-          onChange={handleChange}
-          className="form-control"
-          required
-        />
-      </div>
-      <div className="form-group">
-        <label>Description</label>
-        <input
-          type="text"
-          name="description"
-          value={formState.description}
-          onChange={handleChange}
-          className="form-control"
-          required
-        />
-      </div>
-
-      {ticket && (
-        <>
+          )}
           <div className="form-group">
-            <label>State</label>
-            <select
-              name="state"
-              value={formState.state}
-              onChange={handleChange}
-              className="form-control"
-            >
-              <option value="Created">Created</option>
-              <option value="In progress">In Progress</option>
-              <option value="Done">Done</option>
-              <option value="Closed">Closed</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Estimate Description</label>
+            <label>Brand</label>
             <input
               type="text"
-              name="estimateDescription"
-              value={formState.estimateDescription}
+              name="brand"
+              value={formState.brand}
               onChange={handleChange}
               className="form-control"
+              required
             />
           </div>
           <div className="form-group">
-            <label>Expected Cost</label>
+            <label>Model</label>
             <input
-              type="number"
-              name="expectedCost"
-              value={formState.expectedCost}
+              type="text"
+              name="model"
+              value={formState.model}
               onChange={handleChange}
               className="form-control"
-              step="0.01"
+              required
             />
           </div>
           <div className="form-group">
-            <label>
-              <input
-                type="checkbox"
-                name="estimateAccepted"
-                checked={formState.estimateAccepted}
-                onChange={handleChange}
-              />
-              Estimate Accepted
-            </label>
-          </div>
-          <div className="form-group">
-            <label>Price Paid</label>
+            <label>Registration ID</label>
             <input
-              type="number"
-              name="pricePaid"
-              value={formState.pricePaid}
+              type="text"
+              name="registrationId"
+              value={formState.registrationId}
               onChange={handleChange}
               className="form-control"
-              step="0.01"
+              required
             />
           </div>
-        </>
-      )}
+          <div className="form-group">
+            <label>Description</label>
+            <input
+              type="text"
+              name="description"
+              value={formState.description}
+              onChange={handleChange}
+              className="form-control"
+              required
+            />
+          </div>
 
-      <div className="form-group">
-        <button type="submit" className="btn btn-primary">
-          {ticket ? "Update" : "Create"} Ticket
-        </button>
-      </div>
-    </form>
+          {ticket && (
+            <>
+              <div className="form-group">
+                <label>State</label>
+                <select
+                  name="state"
+                  value={formState.state}
+                  onChange={handleChange}
+                  className="form-control"
+                >
+                  <option value="Created">Created</option>
+                  <option value="In progress">In Progress</option>
+                  <option value="Done">Done</option>
+                  <option value="Closed">Closed</option>
+                </select>
+              </div>
+              <div className="form-group">
+                <label>Estimate Description</label>
+                <input
+                  type="text"
+                  name="estimateDescription"
+                  value={formState.estimateDescription}
+                  onChange={handleChange}
+                  className="form-control"
+                />
+              </div>
+              <div className="form-group">
+                <label>Expected Cost</label>
+                <input
+                  type="number"
+                  name="expectedCost"
+                  value={formState.expectedCost}
+                  onChange={handleChange}
+                  className="form-control"
+                  step="0.01"
+                />
+              </div>
+              <div className="form-group">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="estimateAccepted"
+                    checked={formState.estimateAccepted}
+                    onChange={handleChange}
+                  />
+                  Estimate Accepted
+                </label>
+              </div>
+              <div className="form-group">
+                <label>Price Paid</label>
+                <input
+                  type="number"
+                  name="pricePaid"
+                  value={formState.pricePaid}
+                  onChange={handleChange}
+                  className="form-control"
+                  step="0.01"
+                />
+              </div>
+            </>
+          )}
+
+          <div className="d-grid">
+            <Button type="submit" variant="primary">
+              {ticket ? "Update" : "Create"} Ticket
+            </Button>
+          </div>
+        </form>
+      </Modal.Body>
+    </Modal>
   );
 };
 

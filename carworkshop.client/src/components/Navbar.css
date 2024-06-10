@@ -1,31 +1,53 @@
 nav {
-    background-color: #333;
-    color: rgb(65, 62, 62);
-    padding: 1rem;
-  }
-  
-  ul {
-    list-style-type: none;
-    display: flex;
-    justify-content: space-between;
-    margin: 0;
-    padding: 0;
-  }
-  
-  li {
-    margin-right: 1rem;
-  }
-  
-  a {
-    color: rgb(61, 57, 57);
-    text-decoration: none;
-  }
-  
-  button {
-    background-color: #424141;
-    color: rgb(73, 71, 71);
-    border: none;
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-  }
-  
+  background-color: #333;
+  color: rgb(65, 62, 62);
+  padding: 1rem;
+}
+
+ul {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  padding: 0;
+}
+
+li {
+  margin-right: 1rem;
+}
+
+a {
+  color: rgb(61, 57, 57);
+  text-decoration: none !important;
+}
+
+button.custom-button:not(.btn-outline-danger) {
+  background-color: #424141;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+button.custom-button:not(.btn-outline-danger):hover {
+  background-color: #555;
+}
+
+button.custom-button:not(.btn-outline-danger):focus,
+button.custom-button:not(.btn-outline-danger):active {
+  outline: none;
+  box-shadow: none;
+}
+
+button.btn-outline-danger {
+  background-color: transparent;
+  border-color: #dc3545;
+  color: #dc3545;
+}
+
+button.btn-outline-danger:hover,
+button.btn-outline-danger:focus,
+button.btn-outline-danger:active {
+  background-color: #dc3545;
+  color: white;
+}

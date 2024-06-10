@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
 import axiosInstance from "./services/axiosInstance";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
@@ -86,55 +81,43 @@ function App() {
   return (
     <Router>
       <div>
-        {isAuthenticated && (
-          <Navbar onLogout={handleLogout} userRole={userRole} />
-        )}
-        <Routes>
-          {isAuthenticated ? (
-            <>
-              <Route
-                path="/"
-                element={<Home userRole={userRole} userName={userName} />}
-              />
-              <Route path="/login" element={<Navigate to="/" />} />
-              {userRole === "Admin" && (
-                <>
-                  <Route
-                    path="/employee-management"
-                    element={<EmployeeManagement />}
-                  />
-                  <Route
-                    path="/ticket-management"
-                    element={<TicketManagement userRole={userRole} />}
-                  />
-                </>
-              )}
-              {userRole === "Employee" && (
-                <>
-                  <Route path="/calendar" element={<Calendar />} />
-                  <Route
-                    path="/tickets"
-                    element={<TicketManagement userRole={userRole} />}
-                  />
-                </>
-              )}
-              <Route path="*" element={<Navigate to="/" />} />
-            </>
-          ) : (
-            <>
-              <Route path="/login" element={<Login onLogin={handleLogin} />} />
-              <Route path="*" element={<Navigate to="/login" />} />
-            </>
-          )}
-        </Routes>
+        {isAuthenticated && <Navbar onLogout={handleLogout} userRole={userRole} />}
+        <div style={{ paddingTop: "56px" }}>
+          <Routes>
+            {isAuthenticated ? (
+              <>
+                <Route path="/" element={<Home userRole={userRole} userName={userName} />} />
+                <Route path="/login" element={<Navigate to="/" />} />
+                {userRole === "Admin" && (
+                  <>
+                    <Route path="/employee-management" element={<EmployeeManagement />} />
+                    <Route path="/ticket-management" element={<TicketManagement userRole={userRole} />} />
+                  </>
+                )}
+                {userRole === "Employee" && (
+                  <>
+                    <Route path="/calendar" element={<Calendar />} />
+                    <Route path="/tickets" element={<TicketManagement userRole={userRole} />} />
+                  </>
+                )}
+                <Route path="*" element={<Navigate to="/" />} />
+              </>
+            ) : (
+              <>
+                <Route path="/login" element={<Login onLogin={handleLogin} />} />
+                <Route path="*" element={<Navigate to="/login" />} />
+              </>
+            )}
+          </Routes>
+        </div>
       </div>
     </Router>
   );
 }
 
 const Home = ({ userRole, userName }) => (
-  <div>
-    <h1>Welcome, {userName}!</h1>
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+    <h1 className="pulse">Welcome, {userName}!</h1>
   </div>
 );
 

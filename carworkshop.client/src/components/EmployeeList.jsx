@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EmployeeForm from "./EmployeeForm";
+import { Table, Pagination } from "react-bootstrap";
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalEmployees, setTotalEmployees] = useState(0);
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [employeeToUpdate, setEmployeeToUpdate] = useState(null);
 
   const fetchEmployees = async () => {
@@ -48,8 +49,8 @@ const EmployeeList = () => {
 
   return (
     <div>
-      <h2>Employee Management</h2>
-      <table>
+      <h2 className="mb-4">Employee Management</h2>
+      <Table striped bordered hover>
         <thead>
           <tr>
             <th>Name</th>
@@ -68,7 +69,7 @@ const EmployeeList = () => {
                 <button
                   onClick={() => {
                     setEmployeeToUpdate(employee);
-                    setShowForm(true);
+                    setShowModal(true);
                   }}
                 >
                   Update
@@ -80,23 +81,37 @@ const EmployeeList = () => {
             </tr>
           ))}
         </tbody>
-      </table>
-      <div>
-        Page {page} of {Math.ceil(totalEmployees / pageSize)}
-        <button onClick={() => setPage(page - 1)} disabled={page === 1}>
-          Previous
-        </button>
+      </Table>
+      <div className="d-flex justify-content-between align-items-center">
+        <Pagination>
+          <Pagination.Prev
+            onClick={() => setPage(page - 1)}
+            disabled={page === 1}
+          />
+          <Pagination.Item>{page}</Pagination.Item>
+          <Pagination.Next
+            onClick={() => setPage(page + 1)}
+            disabled={page === Math.ceil(totalEmployees / pageSize)}
+          />
+        </Pagination>
         <button
-          onClick={() => setPage(page + 1)}
-          disabled={page === Math.ceil(totalEmployees / pageSize)}
+          variant="success"
+          onClick={() => {
+            setShowModal(!showModal);
+            setEmployeeToUpdate(null);
+          }}
         >
-          Next
+          Add New Employee
         </button>
-        <button onClick={() => { setShowForm(!showForm); setEmployeeToUpdate(null); }}>
-          {showForm ? "Cancel" : "Add New Employee"}
-        </button>
-        {showForm && <EmployeeForm employee={employeeToUpdate} onEmployeeSaved={fetchEmployees} />}
       </div>
+      {showModal && (
+        <EmployeeForm
+          show={showModal}
+          handleClose={() => setShowModal(false)}
+          employee={employeeToUpdate}
+          onEmployeeSaved={fetchEmployees}
+        />
+      )}
     </div>
   );
 };

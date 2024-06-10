@@ -1,46 +1,68 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import "./Navbar.css";
+import { motion } from "framer-motion";
+import { Navbar, Nav } from "react-bootstrap";
+import './Navbar.css';
 
-function Navbar({ onLogout, userRole }) {
+const variants = {
+  open: { opacity: 1, y: 0 },
+  closed: { opacity: 0, y: "-100%" },
+};
+
+function Navigation({ onLogout, userRole }) {
   return (
-    <nav>
-      <ul>
-        <li>
+    <motion.div
+      initial="closed"
+      animate="open"
+      variants={variants}
+      transition={{ duration: 0.8 }}
+      style={{ width: "100%" }}
+    >
+      <Navbar bg="light" expand="lg" style={{ width: "100%" }}>
+        <Navbar.Brand>
           <Link to="/">Home</Link>
-        </li>
-        {userRole === "Admin" && (
-          <>
-            <li>
-              <Link to="/employee-management">Employee Management</Link>
-            </li>
-            <li>
-              <Link to="/ticket-management">Ticket Management</Link>
-            </li>
-          </>
-        )}
-        {userRole === "Employee" && (
-          <>
-            <li>
-              <Link to="/calendar">Calendar</Link>
-            </li>
-            <li>
-              <Link to="/tickets">Tickets</Link>
-            </li>
-          </>
-        )}
-        <li>
-          <button onClick={onLogout}>Logout</button>
-        </li>
-      </ul>
-    </nav>
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="mr-auto">
+            {userRole === "Admin" && (
+              <>
+                <Nav.Link>
+                  <Link to="/employee-management">Employee Management</Link>
+                </Nav.Link>
+                <Nav.Link>
+                  <Link to="/ticket-management">Ticket Management</Link>
+                </Nav.Link>
+              </>
+            )}
+            {userRole === "Employee" && (
+              <>
+                <Nav.Link>
+                  <Link to="/calendar">Calendar</Link>
+                </Nav.Link>
+                <Nav.Link>
+                  <Link to="/tickets">Tickets</Link>
+                </Nav.Link>
+              </>
+            )}
+          </Nav>
+          <Nav>
+            <Nav.Link>
+              <button variant="outline-danger" onClick={onLogout}>
+                Logout
+              </button>
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+    </motion.div>
   );
 }
 
-Navbar.propTypes = {
+Navigation.propTypes = {
   onLogout: PropTypes.func.isRequired,
   userRole: PropTypes.string.isRequired,
 };
 
-export default Navbar;
+export default Navigation;

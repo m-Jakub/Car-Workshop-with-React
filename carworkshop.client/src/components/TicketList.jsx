@@ -3,13 +3,14 @@ import axios from "axios";
 import TicketForm from "./TicketForm";
 import TicketAssignmentCalendar from "./TicketAssignmentCalendar";
 import PartList from "./PartList";
+import { Table, Pagination } from "react-bootstrap";
 
 const TicketList = ({ userRole }) => {
   const [tickets, setTickets] = useState([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalTickets, setTotalTickets] = useState(0);
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [ticketToUpdate, setTicketToUpdate] = useState(null);
   const [employeeId, setEmployeeId] = useState(null);
   const [selectedTicket, setSelectedTicket] = useState(null);
@@ -90,7 +91,7 @@ const TicketList = ({ userRole }) => {
 
   return (
     <div>
-      <h2>Ticket Management</h2>
+      <h2 className="mb-4">Ticket Management</h2>
       {selectedTicket ? (
         <TicketAssignmentCalendar
           selectedTicketId={selectedTicket}
@@ -103,7 +104,7 @@ const TicketList = ({ userRole }) => {
         />
       ) : (
         <>
-          <table>
+          <Table striped bordered hover>
             <thead>
               <tr>
                 <th>Brand</th>
@@ -136,17 +137,22 @@ const TicketList = ({ userRole }) => {
                     {userRole === "Admin" ? (
                       <>
                         <button
+                          variant="primary"
                           onClick={() => {
                             setTicketToUpdate(ticket);
-                            setShowForm(true);
+                            setShowModal(true);
                           }}
                         >
                           Edit
                         </button>
-                        <button onClick={() => deleteTicket(ticket.ticketId)}>
+                        <button
+                          variant="danger"
+                          onClick={() => deleteTicket(ticket.ticketId)}
+                        >
                           Delete
                         </button>
                         <button
+                          variant="secondary"
                           onClick={() =>
                             setSelectedTicketIdForParts(ticket.ticketId)
                           }
@@ -158,7 +164,10 @@ const TicketList = ({ userRole }) => {
                       ticket.employeeName !== "Not assigned" ? (
                       "-"
                     ) : (
-                      <button onClick={() => acceptTicket(ticket.ticketId)}>
+                      <button
+                        variant="success"
+                        onClick={() => acceptTicket(ticket.ticketId)}
+                      >
                         Accept Ticket
                       </button>
                     )}
@@ -166,38 +175,39 @@ const TicketList = ({ userRole }) => {
                 </tr>
               ))}
             </tbody>
-          </table>
-          <div>
-            Page {page} of {Math.ceil(totalTickets / pageSize)}
-            <button onClick={() => setPage(page - 1)} disabled={page === 1}>
-              Previous
-            </button>
-            <button
-              onClick={() => setPage(page + 1)}
-              disabled={page === Math.ceil(totalTickets / pageSize)}
-            >
-              Next
-            </button>
+          </Table>
+          <div className="d-flex justify-content-between align-items-center">
+            <Pagination>
+              <Pagination.Prev
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+              />
+              <Pagination.Item>{page}</Pagination.Item>
+              <Pagination.Next
+                onClick={() => setPage(page + 1)}
+                disabled={page === Math.ceil(totalTickets / pageSize)}
+              />
+            </Pagination>
             {userRole === "Admin" && (
               <button
+                variant="success"
                 onClick={() => {
-                  setShowForm(!showForm);
+                  setShowModal(!showModal);
                   setTicketToUpdate(null);
                 }}
               >
-                {showForm ? "Cancel" : "Add New Ticket"}
+                Add New Ticket
               </button>
             )}
-            {showForm && userRole === "Admin" && (
-              <TicketForm
-                ticket={ticketToUpdate}
-                onTicketSaved={() => {
-                  fetchTickets();
-                  setShowForm(false);
-                }}
-              />
-            )}
           </div>
+          {showModal && userRole === "Admin" && (
+            <TicketForm
+              show={showModal}
+              handleClose={() => setShowModal(false)}
+              ticket={ticketToUpdate}
+              onTicketSaved={fetchTickets}
+            />
+          )}
         </>
       )}
     </div>
