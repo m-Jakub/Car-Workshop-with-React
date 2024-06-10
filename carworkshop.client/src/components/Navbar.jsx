@@ -20,39 +20,47 @@ function Navigation({ onLogout, userRole }) {
       style={{ width: "100%" }}
     >
       <Navbar bg="light" expand="lg" style={{ width: "100%" }}>
-        <Navbar.Brand>
-          <Link to="/">Home</Link>
-        </Navbar.Brand>
+        <Navbar.Brand as={Link} to="/">Home</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
             {userRole === "Admin" && (
               <>
-                <Nav.Link>
-                  <Link to="/employee-management">Employee Management</Link>
+                <Nav.Link as={Link} to="/employee-management">
+                  Employee Management
                 </Nav.Link>
-                <Nav.Link>
-                  <Link to="/ticket-management">Ticket Management</Link>
+                <Nav.Link as={Link} to="/ticket-management">
+                  Ticket Management
                 </Nav.Link>
               </>
             )}
             {userRole === "Employee" && (
               <>
-                <Nav.Link>
-                  <Link to="/calendar">Calendar</Link>
+                <Nav.Link as={Link} to="/calendar">
+                  Calendar
                 </Nav.Link>
-                <Nav.Link>
-                  <Link to="/tickets">Tickets</Link>
+                <Nav.Link as={Link} to="/tickets">
+                  Tickets
                 </Nav.Link>
               </>
             )}
           </Nav>
           <Nav>
-            <Nav.Link>
-              <button variant="outline-danger" onClick={onLogout}>
+            <Nav.Item>
+              <button
+                onClick={onLogout}
+                style={{
+                  background: 'none',
+                  border: 'none',
+                  padding: 0,
+                  color: 'inherit',
+                  cursor: 'pointer',
+                  textDecoration: 'underline'
+                }}
+              >
                 Logout
               </button>
-            </Nav.Link>
+            </Nav.Item>
           </Nav>
         </Navbar.Collapse>
       </Navbar>

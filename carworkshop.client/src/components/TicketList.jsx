@@ -90,7 +90,7 @@ const TicketList = ({ userRole }) => {
   }, [page, pageSize]);
 
   return (
-    <div>
+    <div className="margins">
       <h2 className="mb-4">Ticket Management</h2>
       {selectedTicket ? (
         <TicketAssignmentCalendar
@@ -192,7 +192,7 @@ const TicketList = ({ userRole }) => {
               <button
                 variant="success"
                 onClick={() => {
-                  setShowModal(!showModal);
+                  setShowModal(true);
                   setTicketToUpdate(null);
                 }}
               >

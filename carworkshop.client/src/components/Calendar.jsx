@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../services/axiosInstance";
+import "./Calendar.css";
 
 const Calendar = () => {
   const [timeSlots, setTimeSlots] = useState({});
@@ -23,7 +24,6 @@ const Calendar = () => {
       try {
         const response = await axiosInstance.get("/Calendar/user");
         setEmployeeId(response.data.id);
-        console.log(response.data.id);
       } catch (error) {
         console.error("Error fetching employee ID:", error);
       }
@@ -37,6 +37,7 @@ const Calendar = () => {
     const existingTimeSlot = timeSlots[`${dayOfWeek}-${hour}`];
 
     if (existingTimeSlot) {
+      if (existingTimeSlot.availabilityStatus === "Busy") return;
       await axiosInstance.delete(
         `/Calendar/DeleteTimeSlot/${existingTimeSlot.timeSlotId}`
       );
@@ -72,24 +73,28 @@ const Calendar = () => {
 
     for (let hour = 6; hour < 20; hour++) {
       const cells = [
-        <td key={`hour-${hour}`}>{`${hour}:00 - ${hour + 1}:00`}</td>,
+        <td key={`hour-${hour}`} className="time-column">{`${hour}:00 - ${
+          hour + 1
+        }:00`}</td>,
       ];
 
       for (let day = 0; day < 7; day++) {
         const key = `${day}-${hour}`;
         const slot = timeSlots[key];
         const status = slot ? slot.availabilityStatus : "Unavailable";
+        const cellClass =
+          status === "Available"
+            ? "available-cell"
+            : status === "Busy"
+            ? "busy-cell"
+            : "unavailable-cell";
 
         cells.push(
           <td
             key={key}
-            className={`day-column ${
-              status === "Available" ? "available-cell" : ""
-            }`}
+            className={`day-column ${cellClass}`}
             onClick={() => handleCellClick(day, hour)}
-          >
-            {status}
-          </td>
+          ></td>
         );
       }
 
@@ -100,8 +105,9 @@ const Calendar = () => {
   };
 
   return (
-    <div>
+    <div className="margins">
       <h2>Schedule</h2>
+      <p className="text-center">Click on a cell to toggle availability</p>
       <table className="table">
         <thead>
           <tr>

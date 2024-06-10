@@ -1,115 +1,130 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import PartForm from "./PartForm";
-import { Modal, Button, Table } from "react-bootstrap";
+import { Form } from "react-bootstrap";
 
-const PartList = ({ ticketId, onBack }) => {
-  const [parts, setParts] = useState([]);
-  const [showForm, setShowForm] = useState(false);
-  const [partToUpdate, setPartToUpdate] = useState(null);
+const PartForm = ({ part, onPartSaved, ticketId }) => {
+  const [formData, setFormData] = useState({
+    name: "",
+    amount: 1,
+    unitPrice: 0.0,
+  });
+  const [errors, setErrors] = useState([]);
 
-  const fetchParts = async () => {
-    try {
-      const response = await axios.get(
-        `https://localhost:7228/api/part?ticketId=${ticketId}`,
-        { withCredentials: true }
-      );
-      setParts(response.data);
-    } catch (error) {
-      console.error("Error fetching parts:", error);
+  useEffect(() => {
+    if (part) {
+      setFormData({
+        name: part.name,
+        amount: part.amount,
+        unitPrice: part.unitPrice,
+        ticketId: ticketId,
+        partId: part.partId,
+      });
+    } else {
+      setFormData({
+        name: "",
+        amount: 1,
+        unitPrice: 0.0,
+        ticketId: ticketId,
+      });
     }
+  }, [part, ticketId]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const deletePart = async (id) => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this part?"
-    );
-    if (confirmDelete) {
-      try {
-        const response = await axios.delete(
-          `https://localhost:7228/api/part/${id}`,
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrors([]);
+
+    try {
+      if (part) {
+        const response = await axios.put(
+          `https://localhost:7228/api/part/${part.partId}`,
+          formData,
           { withCredentials: true }
         );
-        if (response.status === 204) {
-          fetchParts();
+        if (response.status === 200 || response.status === 204) {
+          onPartSaved();
+        } else {
+          setErrors(["Unexpected response status: " + response.status]);
         }
-      } catch (error) {
-        console.error(error);
+      } else {
+        const response = await axios.post(
+          "https://localhost:7228/api/part",
+          formData,
+          { withCredentials: true }
+        );
+        if (response.status === 200 || response.status === 201) {
+          onPartSaved();
+        } else {
+          setErrors(["Unexpected response status: " + response.status]);
+        }
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 400) {
+        const serverErrors = error.response.data.errors || [
+          error.response.data,
+        ];
+        setErrors(serverErrors);
+      } else {
+        setErrors(["An unexpected error occurred."]);
       }
     }
   };
 
-  useEffect(() => {
-    fetchParts();
-  }, [ticketId]);
-
   return (
-    <div>
-      <h2>Parts Management</h2>
-      <Button variant="secondary" onClick={onBack}>
-        Back to Ticket List
-      </Button>
-      <Table striped bordered hover className="mt-3">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Unit Price</th>
-            <th>Total Price</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {parts.map((part) => (
-            <tr key={part.partId}>
-              <td>{part.name}</td>
-              <td>{part.amount}</td>
-              <td>{part.unitPrice}</td>
-              <td>{part.totalPrice}</td>
-              <td>
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    setPartToUpdate(part);
-                    setShowForm(true);
-                  }}
-                >
-                  Edit
-                </Button>
-                <Button variant="danger" onClick={() => deletePart(part.partId)}>
-                  Delete
-                </Button>
-              </td>
-            </tr>
+    <Form onSubmit={handleSubmit}>
+      {errors.length > 0 && (
+        <div className="error-messages">
+          {errors.map((error, index) => (
+            <div key={index} style={{ color: "red" }}>
+              {error}
+            </div>
           ))}
-        </tbody>
-      </Table>
-      <Button
-        variant="success"
-        onClick={() => {
-          setShowForm(!showForm);
-          setPartToUpdate(null);
-        }}
-      >
-        {showForm ? "Cancel" : "Add New Part"}
-      </Button>
-      <Modal show={showForm} onHide={() => setShowForm(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>{partToUpdate ? "Edit Part" : "Add New Part"}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <PartForm
-            part={partToUpdate}
-            onPartSaved={() => {
-              fetchParts();
-              setShowForm(false);
-            }}
-            ticketId={ticketId}
-          />
-        </Modal.Body>
-      </Modal>
-    </div>
+        </div>
+      )}
+      <Form.Group>
+        <Form.Label>Name</Form.Label>
+        <Form.Control
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          required
+        />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>Amount</Form.Label>
+        <Form.Control
+          type="number"
+          name="amount"
+          value={formData.amount}
+          onChange={handleChange}
+          min="1"
+          required
+        />
+      </Form.Group>
+      <Form.Group>
+        <Form.Label>Unit Price</Form.Label>
+        <Form.Control
+          type="number"
+          name="unitPrice"
+          value={formData.unitPrice}
+          onChange={handleChange}
+          step="0.01"
+          required
+        />
+      </Form.Group>
+      <button type="submit" variant="primary">
+        {part ? "Update Part" : "Add Part"}
+      </button>
+    </Form>
   );
 };
 
-export default PartList;
+export default PartForm;

@@ -111,7 +111,21 @@ namespace CarWorkshop.Server.Controllers
             existingTicket.PricePaid = ticket.PricePaid;
 
             _context.Entry(existingTicket).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TicketExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return NoContent();
         }

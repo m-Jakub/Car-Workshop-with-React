@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import PartForm from "./PartForm";
+import { Modal, Table } from "react-bootstrap";
 
 const PartList = ({ ticketId, onBack }) => {
   const [parts, setParts] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [partToUpdate, setPartToUpdate] = useState(null);
 
   const fetchParts = async () => {
@@ -44,9 +45,8 @@ const PartList = ({ ticketId, onBack }) => {
 
   return (
     <div>
-      <h2>Parts Management</h2>
       <button onClick={onBack}>Back to Ticket List</button>
-      <table>
+      <Table striped bordered hover>
         <thead>
           <tr>
             <th>Name</th>
@@ -65,37 +65,46 @@ const PartList = ({ ticketId, onBack }) => {
               <td>{part.totalPrice}</td>
               <td>
                 <button
+                  variant="primary"
                   onClick={() => {
                     setPartToUpdate(part);
-                    setShowForm(true);
+                    setShowModal(true);
                   }}
                 >
                   Edit
                 </button>
-                <button onClick={() => deletePart(part.partId)}>Delete</button>
+                <button variant="danger" onClick={() => deletePart(part.partId)}>
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
       <button
+        variant="success"
         onClick={() => {
-          setShowForm(!showForm);
+          setShowModal(true);
           setPartToUpdate(null);
         }}
       >
-        {showForm ? "Cancel" : "Add New Part"}
+        Add New Part
       </button>
-      {showForm && (
-        <PartForm
-          part={partToUpdate}
-          onPartSaved={() => {
-            fetchParts();
-            setShowForm(false);
-          }}
-          ticketId={ticketId}
-        />
-      )}
+      <Modal show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>{partToUpdate ? "Edit Part" : "Add New Part"}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <PartForm
+            part={partToUpdate}
+            onPartSaved={() => {
+              fetchParts();
+              setShowModal(false);
+            }}
+            ticketId={ticketId}
+          />
+        </Modal.Body>
+      </Modal>
     </div>
   );
 };

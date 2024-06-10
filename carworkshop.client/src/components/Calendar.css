@@ -1,0 +1,48 @@
+.table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table th {
+    background-color: #f2f2f2;
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.table td {
+    border: 1px solid #dddddd;
+    padding: 8px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.time-column {
+    width: 120px;
+}
+
+.day-column {
+    width: calc((100% - 120px) / 7);
+}
+
+.day-column:hover {
+    background-color: #f0f0f0 !important;
+}
+
+.available-cell {
+    background-color: rgb(195, 243, 195)!important;
+    color: white;
+}
+
+.busy-cell {
+    background-color: rgb(156, 155, 155)!important;
+    color: white;
+}
+
+.available-cell:hover {
+    background-color: #f0f0f0!important;
+  }
+
+.selected-cell {
+    background-color: #f0d55f!important;
+}

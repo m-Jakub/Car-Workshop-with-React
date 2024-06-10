@@ -48,7 +48,7 @@ const EmployeeList = () => {
   }, [page, pageSize]);
 
   return (
-    <div>
+    <div className="margins"> 
       <h2 className="mb-4">Employee Management</h2>
       <Table striped bordered hover>
         <thead>

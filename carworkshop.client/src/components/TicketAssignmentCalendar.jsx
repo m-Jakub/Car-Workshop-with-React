@@ -61,11 +61,12 @@ const TicketAssignmentCalendar = ({ selectedTicketId, onConfirm }) => {
                 ? isSelected
                   ? "selected-cell"
                   : "available-cell"
-                : ""
+                : status === "Busy"
+                ? "busy-cell"
+                : "unavailable-cell"
             }`}
             onClick={() => handleCellClick(day, hour)}
           >
-            {status}
           </td>
         );
       }
@@ -78,7 +79,8 @@ const TicketAssignmentCalendar = ({ selectedTicketId, onConfirm }) => {
 
   return (
     <div>
-      <h2>Assign Time Slots to Ticket</h2>
+      <h3 className="text-center">Assign Time Slots to Ticket</h3>
+      <p className="text-center">Select available time slots to assign to the ticket.</p>
       <table className="table">
         <thead>
           <tr>

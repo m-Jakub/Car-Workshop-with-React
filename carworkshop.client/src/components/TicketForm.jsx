@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 import authService from "../services/authService";
 import { Modal, Button } from "react-bootstrap";
 
-const TicketForm = ({ ticket, onTicketSaved }) => {
+const TicketForm = ({ show, handleClose, ticket, onTicketSaved }) => {
   const [formState, setFormState] = useState({
     brand: "",
     model: "",
@@ -17,8 +16,6 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
     pricePaid: 0,
   });
   const [errors, setErrors] = useState([]);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (ticket) {
@@ -51,6 +48,8 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
     });
   };
 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors([]);
@@ -69,6 +68,7 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
         );
         if (response.status === 204 || response.status === 200) {
           onTicketSaved();
+          handleClose();
         } else {
           setErrors(["Unexpected response status: " + response.status]);
         }
@@ -91,6 +91,7 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
             pricePaid: "",
           });
           onTicketSaved();
+          handleClose();
         } else {
           setErrors(["Unexpected response status: " + response.status]);
         }
@@ -111,17 +112,15 @@ const TicketForm = ({ ticket, onTicketSaved }) => {
     <Modal show={show} onHide={handleClose}>
       <Modal.Header closeButton>
         <Modal.Title>
-          {employee ? "Edit Ticket" : "Create New Ticket"}
+          {ticket ? "Edit Ticket" : "Create New Ticket"}
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <form onSubmit={handleSubmit}>
           {errors.length > 0 && (
-            <div className="error-messages">
+            <div className="alert alert-danger">
               {errors.map((error, index) => (
-                <div key={index} style={{ color: "red" }}>
-                  {error}
-                </div>
+                <div key={index}>{error}</div>
               ))}
             </div>
           )}
